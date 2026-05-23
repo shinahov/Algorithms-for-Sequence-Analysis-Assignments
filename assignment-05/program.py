@@ -2,13 +2,17 @@ import sys
 
 
 def align(s, t):
+    # computes the full table
     m, n = len(s), len(t)
     T = []
+    # first row assignement
     T.append([i for i in range(m + 1)])
     for i in range(1, n + 1):
+        # first column assignemnt
         T.append([None] * (m + 1))
         T[i][0] = i
         for j in range(1, m + 1):
+            # minimum of the left, digonal and upper value
             T[i][j] = min(
                 T[i - 1][j - 1] + (0 if s[j - 1] == t[i - 1] else 1),
                 T[i - 1][j] + 1,
@@ -18,9 +22,11 @@ def align(s, t):
 
 
 def align_banded(s, t, k):
+    # computes the table inside the diagonal band size k
     INF = 10**9
     m, n = len(s), len(t)
     T = []
+    # initialize first row with INF
     T.append([INF] * (m + 1))
 
     for j in range(m + 1):
@@ -30,10 +36,12 @@ def align_banded(s, t, k):
     for i in range(1, n + 1):
         T.append([INF] * (m + 1))
 
+        # initialize first column if it lies inside the band
         if abs(i - 0) <= k:
             T[i][0] = i
 
         for j in range(1, m + 1):
+            # compute anly cells with max dist k to diagonal
             if abs(i - j) <= k:
                 T[i][j] = min(
                     T[i - 1][j - 1] + (0 if s[j - 1] == t[i - 1] else 1),
@@ -51,7 +59,7 @@ def backtrace(dp_table, s, t):
     str_j = ""
 
     while i > 0 or j > 0:
-
+        # move diagonal if possible
         if dp_table[i - 1][j - 1] <= dp_table[i - 1][j]:
             if dp_table[i - 1][j - 1] <= dp_table[i][j - 1]:
                 str_i = s[j - 1] + str_i
@@ -59,15 +67,18 @@ def backtrace(dp_table, s, t):
                 i = i - 1
                 j = j - 1
             else:
+                # move left
                 str_i = s[j - 1] + str_i
                 str_j = "-" + str_j
                 j = j - 1
         else:
             if dp_table[i - 1][j] < dp_table[i][j - 1]:
+                # move up
                 str_i = "-" + str_i
                 str_j = t[i - 1] + str_j
                 i = i - 1
             else:
+                # move left
                 str_i = s[j - 1] + str_i
                 str_j = "-" + str_j
                 j = j - 1
